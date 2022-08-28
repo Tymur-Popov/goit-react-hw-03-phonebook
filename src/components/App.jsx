@@ -17,13 +17,13 @@ export class App extends Component {
       name,
       number,
     };
-    this.state.contacts.some(
-      i =>
-        (i.name.toLowerCase() === contact.name.toLowerCase() &&
-          i.number === contact.number) ||
-        i.number === contact.number
-    )
-      ? alert(`${name} is already in contacts`)
+
+    const findContact = this.state.contacts.find(contact =>
+      contact.name.toLowerCase().includes(name.toLowerCase())
+    );
+
+    findContact
+      ? alert(`${name} is already in contact`)
       : this.setState(({ contacts }) => ({
           contacts: [contact, ...contacts],
         }));
@@ -32,6 +32,17 @@ export class App extends Component {
   changeFilterInput = e => {
     this.setState({ filter: e.target.value });
   };
+
+  componentDidMount() {
+		const contacts = localStorage.getItem('contacts');
+		const parsedContacts = JSON.parse(contacts);
+
+		if (parsedContacts) this.setState({ contacts: parsedContacts });
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (this.state.contacts !== prevState.contacts) localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+	}
 
   findContacts = () => {
     const { filter, contacts } = this.state;
